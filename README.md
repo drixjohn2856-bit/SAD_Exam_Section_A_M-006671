@@ -57,17 +57,21 @@ The application stores Scholar-submitted academic summaries and evidence referen
 
 ## Deploy to GitHub Pages
 
-The GitHub Actions workflow at `.github/workflows/deploy-pages.yml` builds and deploys the site when changes are pushed to `main`.
+This project publishes the built static files from the repository's `main` branch root. The local `.env` file is not uploaded; Vite embeds the browser-facing Supabase URL and publishable/anon key into the generated JavaScript bundle during the build.
 
-1. In the GitHub repository, add these **Actions variables** under **Settings → Secrets and variables → Actions → Variables**:
-   - `VITE_SUPABASE_URL`
-   - `VITE_SUPABASE_ANON_KEY`
-2. Under **Settings → Pages**, set the deployment source to **GitHub Actions**.
-3. Push to `main` or manually run the **Deploy to GitHub Pages** workflow. After a successful run, open its deployment environment to find the site URL.
-4. In Supabase **Authentication → URL Configuration**, set the Pages URL as the Site URL and add it to the allowed redirect URLs.
-5. Confirm that the database migrations and `create-scholar` Edge Function are deployed to the same Supabase project used by the site.
+1. Create `.env` from `.env.example` and set `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY`. Only use the public publishable/anon key; never use or publish a service-role key.
+2. Build the files that GitHub Pages serves:
 
-The site is publicly accessible when hosted from a public repository. A successful Pages deployment confirms the static site was published; it does not verify Supabase configuration or connectivity. The local `.env` file is excluded from Git.
+   ```sh
+   npm run build:pages
+   ```
+
+   This builds the app and copies the generated HTML and hashed assets into the repository root and `assets/`.
+3. Commit and push the changed `index.html` and new files under `assets/` to `main`.
+4. In the repository, open **Settings → Pages** and select **Deploy from a branch**, branch **main**, folder **/(root)**.
+5. In Supabase **Authentication → URL Configuration**, set the Pages URL as the Site URL and add it to the allowed redirect URLs. Confirm that the database migrations and `create-scholar` Edge Function are deployed to the same Supabase project.
+
+The site is publicly accessible from this public repository. A successful Pages publish confirms that static files were served; it does not verify Supabase configuration or connectivity.
 
 ## Workflow and data notes
 
